@@ -1,0 +1,25 @@
+{
+  "name": "templater_core",
+  "version": "0.0.0",
+  "description": "Templater_core est un module qui, à partir d'un fichier JSON, créer des composants JSX",
+  "main": "main.js",
+  "scripts": {
+    "build": "webpack --config webpack.prod.js",
+    "test": "mocha test/index.js",
+    "start": "webpack serve --open --config webpack.dev.js"
+  },
+  "keywords": [],
+  "author": "DreamDevStudio",
+  "license": "",
+  "devDependencies": {
+    "exports-loader": "^4.0.0",
+    "jsdom": "^22.1.0",
+    "mocha": "^10.2.0",
+    "webpack": "^5.88.2",
+    "webpack-cli": "^5.1.4",
+    "webpack-merge": "^5.9.0"
+  },
+  "dependencies": {
+    "mock-browser": "^0.92.14"
+  }
+}
