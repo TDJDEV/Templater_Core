@@ -1,116 +1,84 @@
+import * as assert from 'assert';
+import Tools from '../tools/index.mjs';
+
 const
-  assert = require('assert'),
-  [a,b, c, ...args] = process.argv,
-  fs = require('fs'),
-  JSDOM = require('jsdom').JSDOM,
-  {General, ...testBank} = browseDir('test/tests'),
-  otorp = fs.readFileSync('./dist/otorp.min.js', 'utf8'),
   counter = [],
-  defaultTargetGetter = newTargetGetter();
+  root = process.cwd(),
+  dirname = `${root}/src/`;
 
-let current;
+const [a,b, c, ...args] = process.argv
+const { reduceDir } = Tools
+const features = browseDir(`${root}/test/tests/*`)
 
-function randomHTML(i){
-  const tags = [
-    'div',
-    'main',
-    'header',
-    'footer',
-    'section',
-    'nav',
-  ]
-  const tag = tags[Math.floor(Math.random() * tags.length)]
-  return `<${tag} id="item${i}"></${tag}>`
-}
-function getCollectionSource(doc,tag){
-  const collectionSource = doc.createElement(tag||'div');
-  collectionSource.innerHTML = new Array(10).fill().map(randomHTML).join("")
-  return collectionSource
-}
-function createInstanceGenerator(window){
-  const {Array, Number, document:doc} = window;
-  return (query) => {
-    const [word,name] = query.split('.');
-    switch (word) {
-      case "root": return window;
-      case "document": return doc;
-      case "elem": return getCollectionSource(doc,name);
-      case "collection": return getCollectionSource(doc).children;
-      case "nodelist": return getCollectionSource(doc).childNodes;
-      case "array": return new Array(..."abcdefghijklmnopqrstuvwxyz");
-      case "number": return new Number(Math.random() * 10);
-      default: throw new Error("unknow target type");
-    }
+console.log(features)
+async function reducer(o, dirent) {
+  const { name, path } = dirent, url=`${path}/${name}`;
+
+  let value;
+  if (dirent.isDirectory()){
+    value = await browseDir(url+'/*');
+  } else {
+    value = await readFile(url);
+    value.module = await getModule(value.path,value.key)
   }
-}
-function newTargetGetter(html){
-  return createInstanceGenerator(
-    getWindow(
-      `
-        <html>
-          <head>
-            ${html}
-            <script>${otorp}</script>
-          </head>
-          <body></body>
-        </html>
-      `,
-      {
-        url: 'http://localhost/otorp/mocha/',
-        runScripts: "dangerously"
-      }
-    )
-  )
-}
-function browseDir(path, fn){
-  return fs.readdirSync(path,{ withFileTypes: true }).reduce((o, dirent) => {
-    const { name, path } = dirent
-    return o[name.split('.')[0]] = ((dirent.isDirectory() ? browseDir : readFile)(path+'/'+name, fn)), o;
-  }, {})
+
+  addToBank(await o, name.split('.')[0], value)
+  return o;
 }
 
-function readFile(path){ return require('../'+path) }
+function addToBank(o, key, val) { return o[key] = val }
 
-function getWindow(){	return new JSDOM(...arguments).window }
+function browseDir(path){ return reduceDir(path, reducer, {}) }
+
+// function browseDir(path, fn){
+//   // return fs.readdirSync(path,{ withFileTypes: true }).reduce((o, dirent) => {
+//   return readdirSync(path,{ withFileTypes: true }).reduce((o, dirent) => {
+//     const { name, path } = dirent
+//     return o[name.split('.')[0]] = await((dirent.isDirectory() ? browseDir : readFile)(path+'/'+name, fn)), o;
+//   }, {})
+// }
+
+function readFile(path, key='default'){ return import(path).then(x=>x[key]) }
+function getModule(path,key) { return readFile(dirname+path,key) }
+
 
 function describeCategory([name, items]){
-  const bool = !!(testBank[name] || current && current[name])
   
-  describe(items.title || name, () => {
-    const targetGetter = items.html ? newTargetGetter(items.html) : this;
-    if(bool) Object.entries(items).forEach(describeCategory.bind(targetGetter));
-    else testFeature.bind(name)(items, targetGetter);
+  describe(items.title || name, async () => {
+    if(!items.tests?.length) Object.entries(items).forEach(describeCategory);
+    else testFeature.bind(name)(items, await getModule(items.path, items.key))
   })
 }
 
-function testFeature({ tests, targets, defaultProcess, words, title }, getInstance){
-  words && words.every(entry => Array.isArray(entry))
-    ? counter.push(...words.map(params=> ({params, targets})))
-    : counter.push({params: words, targets})
+function testFeature({ tests, defaultProcess, title }, module){
   
+  counter.push(items.title)
   if(!Array.isArray(tests)) {
-    console.log(...arguments)
     throw new Error(`tests must be an array: tests => ${tests} at ${title||this}`)
   }
-  targets.forEach(target => tests.forEach(({name, process, params = [], result, targets = []}) => {
-    if(targets.length && !targets.includes(target)) return;
-    it(`${target}: ${name}`, () => {
-      assert((process||defaultProcess)(getInstance(target), {params, result}, getInstance('root')))
-    })
-  }))
-}
 
-function initTest(name, o){
-  describe(name, () => {
-    Object.entries(typeof o === "function" ? (current = o(counter)): o).forEach(describeCategory.bind(defaultTargetGetter))
-    typeof o !== "function" && console.log("feature number => ",counter.length + Object.keys(General).length)
+  tests.forEach(({name, process, params = [], expected}) => {
+    it(name, () => assert((process||defaultProcess)(module, params, expected)) )
   })
 }
 
-const config = ((i)=> i>=0 ? !args.splice(i, 1)[0] : !0)(args.indexOf("no-config"))
+async function initTest(name, promise){
+  console.log("toto")
+  console.log(promise)
+  const o = await promise
+  console.log(o, promise)
+  describe(name, () => {
+    Object.entries(typeof o === "function" ? (current = o(counter)): o).forEach(describeCategory)
+    typeof o !== "function" && console.log("feature number => ",counter.length)
+  })
+  run()
+}
 
-const features = args.length ? args.reduce((acc, key)=>(testBank[key] && (acc[key] = testBank[key]), acc), {}) : testBank;
+async function filter(arr) {
+  return args.length ? args.reduce((acc, key)=>(arr[key] && (acc[key] = arr[key]), acc), {}) : arr;
+}
+// const config = ((i)=> i>=0 ? !args.splice(i, 1)[0] : !0)(args.indexOf("no-config"))
 
-initTest('prototype addition', features)
-
-config && Object.entries(General).forEach(args => initTest(...args))
+const tests = filter(features)
+console.log(tests)
+initTest('tests', tests)

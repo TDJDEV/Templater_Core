@@ -1,7 +1,10 @@
 const someTest = {
   title: 'someTest',
   tests: [],
+  path: 'components/default.js',
+  key: 'default',
   defaultProcess(fn= (()=>true), params, expected){
+    console.log('defaultProcess =>',arguments)
     if(fn(...params)===expected) return true;
     else {
       throw new Error("unexpected result");
@@ -9,15 +12,13 @@ const someTest = {
   }
 }, { tests } = someTest;
 
-with(tests){
-
-  push({
+  tests.push({
     name: 'with a simple string',
     result: "toto", // required if process is not set
     params: ["toto"]
   })
   
-  push({
+  tests.push({
     name: 'with an object',
     process(target, params, expected){
       try {
@@ -31,7 +32,5 @@ with(tests){
     params: [false],
     result: "The token provided contains HTML space characters, which are not valid in tokens."
   })
-  
-}
 
-module.exports = someTest
+export default someTest
