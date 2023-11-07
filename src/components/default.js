@@ -1,5 +1,5 @@
 // Remove the first child element from the element.
-export const defaultComponent = {
+export default {
   // jsx(){ return (<>{'toto'}</>) },
   model: {}
 }

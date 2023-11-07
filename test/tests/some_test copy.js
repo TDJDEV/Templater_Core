@@ -1,9 +1,9 @@
 const someTest = {
-  title: 'someTest',
+  title: 'someTest 2',
   tests: [],
   path: 'components/default.js',
   // key: 'default',
-  defaultProcess(mod, params, expected) {
+  defaultProcess(mod, params, expected){
     console.log(mod)
     if(params[0] === expected) return true;
     else {
