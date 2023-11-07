@@ -1,4 +1,3 @@
-// const readdirSync = import.meta.glob || (await import('fs')).readdirSync
 import {globSync} from "glob";
 
 export function browseDir(path, fn, opt){ return readDir(path,opt).forEach(fn) }
