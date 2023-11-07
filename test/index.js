@@ -12,16 +12,15 @@ const features = browseDir(`${root}/test/tests/*`)
 
 async function reducer(o, dirent) {
   const { name, path } = dirent, url=`${path}/${name}`;
+  let value = await (dirent.isDirectory() ? browseDir(url+'/*') : readFile(url));
   
   return addToBank(
-    // get accumulator object
-    await o,
-    // get property key
-    name.split('.')[0],
+    await o, // get accumulator object
+    name.split('.')[0], // get property key
     // get property value
-    await dirent.isDirectory()
-      ? browseDir(url+'/*')
-      : addToBank(await readFile(url), 'module', await readFile(`${root}/src/${value.path}`))
+    value.path 
+      ? addToBank(value, "module", await readFile(`${root}/src/${value.path}`))
+      : value
   )
 }
 
