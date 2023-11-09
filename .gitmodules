@@ -1,0 +1,3 @@
+[submodule "src/templater"]
+	path = src/templater
+	url = git@github.com:lanagramme/templater
