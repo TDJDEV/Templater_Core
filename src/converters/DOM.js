@@ -1,35 +1,46 @@
 
 const
   checkers = new Map, // list of specialised checking methods
-  checker = checkers.get.bind(checkers) // shorcut to the "get" method of the Map "checkers"
+  checker = checkers.get.bind(checkers), // shorcut to the "get" method of the Map "checkers"
+  entries = Object.entries
+;
+
+console.log(document.body, document)
+let addAttr = document.body.setAttribute;
 
 
-// Default checking methods for attributes that doesnt have a specialised one
+// Default checking methods for attributes without a specialised one
 function defaultChecker(value) { return typeof value === 'string' }
 // Check the attribute
-function check(attr, value) { return (checker(attr) || defaultChecker)(value) }
+function checkAttr(attr, value) { return (checker(attr) || defaultChecker)(value) }
+// Check if
+function checkCustom(o, key) { return !o[key] }
+
+
 // Convert an object in HTMLElement
 export default function (data, childHandler, {before, after}){
   const
+
     { type:tag, attrs, custom } = before(data),
     // create HTMLElement
     elem = document.createElement(tag)
   
+  addAttr = addAttr.bind(elem)
   // Loop on attributes
   try{
-    Object.entries(attrs||{}).forEach(([key, val])=>{
+    entries(attrs||{}).forEach(([name, value])=>{
       // check attribute
-      !check(key, val)
+      !checkAttr(name, value)
       // Add attribute
-      && elem.setAttribute(key,val)
+      && addAttr(name,value)
     })
   } catch { throw new Error("attrs must an object") }
 
   // Loop on custom attributes
   try {
-    Object.entries(custom||{}).forEach(([key, val])=>{ elem.setAttribute(key,val) })
+    entries(custom||{}).forEach(([name, value])=>{ !attrs[name] && addAttr(name,value) })
+    entries(custom||{}).forEach(([name, value])=>{ checkCustom(attrs, name) && addAttr(name,value) })
   } catch { throw new Error("custom must an object") }
-  // Object.entries(custom).forEach(([key, val])=>{ elem.setAttribute(`data-${key}`,val) })
 
   // add children
   elem.append(...childHandler(data.children))
