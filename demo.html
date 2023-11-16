@@ -8,17 +8,9 @@
   <body>
     <script src="./dist/templater.min.js"></script>
     <script>
-      const myMap = new Map
-      function after(a, b) { myMap.set(a,b) }
-      function before(data) { return Object.entries(data).reduce(formatElem,{}) }
-      
-      function formatElem(elem, [key, value]) {
-        return (elem[key] = typeof value === 'string' ? `Formated-${value}` : value), elem
-      }
-
-      function generate(){
-        myMap.clear()
-        const Template = {
+      const
+        myMap = new Map
+        Template = {
           type: "toto",
           children: [
             {
@@ -47,9 +39,20 @@
             },
           ]
         }
+      ;
+
+
+      function after(a, b) { myMap.set(a,b) }
+      function before(data) { return Object.entries(data).reduce(formatElem,{}) }
+      
+      function formatElem(elem, [key, value]) {
+        return (elem[key] = typeof value === 'string' ? `Formated-${value}` : value), elem
+      }
+
+      function generate(){
+        myMap.clear()
         
-    
-        console.log(Converter(Template, 'dom', { before, after }))
+        return Converter(Template, 'dom', { before, after })
       }
     </script>
   </body>

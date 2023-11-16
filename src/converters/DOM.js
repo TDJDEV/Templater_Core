@@ -6,41 +6,42 @@ const
 ;
 
 console.log(document.body, document)
-let addAttr = document.body.setAttribute;
+let addAttr = document.body.setAttribute, msg;
 
 
 // Default checking methods for attributes without a specialised one
 function defaultChecker(value) { return typeof value === 'string' }
-// Check the attribute
+// Check the common attribute
 function checkAttr(attr, value) { return (checker(attr) || defaultChecker)(value) }
-// Check if
-function checkCustom(o, key) { return !o[key] }
+// Check if an attribute is duplicated
+function checkCustom(o, key) { if((key in o)) throw msg = `duplicate attribute detected: ${key}` }
 
 
 // Convert an object in HTMLElement
 export default function (data, childHandler, {before, after}){
   const
-
+    // get formatted template data
     { type:tag, attrs, custom } = before(data),
     // create HTMLElement
     elem = document.createElement(tag)
+  ;
   
   addAttr = addAttr.bind(elem)
-  // Loop on attributes
+
   try{
+    // Loop on attributes
+    msg = "attrs must an object"
     entries(attrs||{}).forEach(([name, value])=>{
       // check attribute
-      !checkAttr(name, value)
+      checkAttr(name, value)
       // Add attribute
       && addAttr(name,value)
     })
-  } catch { throw new Error("attrs must an object") }
 
-  // Loop on custom attributes
-  try {
-    entries(custom||{}).forEach(([name, value])=>{ !attrs[name] && addAttr(name,value) })
+    // Loop on custom attributes
+    msg = "custom must an object"
     entries(custom||{}).forEach(([name, value])=>{ checkCustom(attrs, name) && addAttr(name,value) })
-  } catch { throw new Error("custom must an object") }
+  } catch { err(msg) }
 
   // add children
   elem.append(...childHandler(data.children))

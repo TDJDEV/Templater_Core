@@ -21,10 +21,10 @@ import converters from './converters/main.js'
 
 console.log(converters)
 
-function err(msg) { throw new Error(msg) }
 function outputErr() { err('unknown output type') }
 function templateErr() { err('template must be an object') }
 
+window.err = function (msg) { throw new Error(msg) }
 window.Converter = (template, output, {before=x=>x, after=()=>{}}={}) => {
   if(typeof template !== 'object' || Array.isArray(template) ) templateErr()
 
