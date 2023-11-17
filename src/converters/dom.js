@@ -1,4 +1,3 @@
-
 const
   checkers = new Map, // list of specialised checking methods
   checker = checkers.get.bind(checkers), // shorcut to the "get" method of the Map "checkers"

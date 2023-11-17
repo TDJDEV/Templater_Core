@@ -1,4 +1,4 @@
-import DOM from "./DOM.js"
+import DOM from "./dom.js"
 
 export default (new Map)
   .set('dom',DOM)
