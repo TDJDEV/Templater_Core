@@ -1,14 +1,13 @@
 import { hooks , childHandler } from "../hooks.js";
 // import data from "../data.json";
 // import module from "../../src/components/default.js";
-// import module from "../../src/converters/dom.js";
+// import DOMConverter from "../../src/";
+
 const someTest = {
   title: 'someTest 2',
   tests: [],
-  // path: 'converters/dom.js',
-  path: 'components/default.js',
-  key: 'default',
-  // module,
+  path: 'converters/DOM.js',
+  // module: DOMConverter,
   defaultProcess(mod, params, expected){
     mod(...params)
     if(params[0] === expected) return true;

@@ -1,6 +1,8 @@
 import assert from 'assert';
 import Tools from '../tools/index.mjs';
-
+import { JSDOM } from 'jsdom'
+globalThis.window = (new JSDOM('<!doctype html><html><body></body></html>')).window
+globalThis.document = window.document
 const
   counter = [],
   {argv, cwd} = process,
@@ -58,7 +60,6 @@ async function filter(arr) {
   arr = await arr
   return args.length ? args.reduce((acc, key)=>(arr[key] && (acc[key] = arr[key]), acc), {}) : arr;
 }
-// const config = ((i)=> i>=0 ? !args.splice(i, 1)[0] : !0)(args.indexOf("no-config"))
-
+global.toto = true
 const tests = filter(features)
 initTest('tests', tests)

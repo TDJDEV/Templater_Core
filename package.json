@@ -27,6 +27,7 @@
   },
   "dependencies": {
     "glob": "^10.3.10",
+    "jsdom": "^22.1.0",
     "mock-browser": "^0.92.14"
   },
   "type": "module"

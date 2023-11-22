@@ -17,7 +17,7 @@ function checkCustom(o, key) { if((key in o)) throw msg = `duplicate attribute d
 
 
 // Convert an object in HTMLElement
-export default function (data, childHandler, {before, after}){
+export default function (data, childHandler, {before, after}={}){
   const
     // get formatted template data
     { type:tag, attrs, custom } = before(data),
