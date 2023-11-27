@@ -26,7 +26,7 @@ function templateErr() { err('template must be an object') }
 function generatePostProcessor(fn) { return (res, source) => (fn(res, source), res) }
 
 window.err = function (msg) { throw new Error(msg) }
-window.Converter = (template, output, {before=x=>x, after=()=>{}}={}) => {
+window.Convertion = function Convertion(template, output, {before=x=>x, after=()=>{}}={}) {
   
   const
     converter = converters.get(output),
@@ -41,3 +41,5 @@ window.Converter = (template, output, {before=x=>x, after=()=>{}}={}) => {
 
   return handleTemplate(converter || outputErr, template)
 }
+
+export default Convertion
