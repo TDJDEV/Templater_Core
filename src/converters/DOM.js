@@ -17,10 +17,8 @@ function checkCustom(o, key) { if((key in o)) throw msg = `duplicate attribute d
 
 
 // Convert an object in HTMLElement
-export default function (data, childHandler, {before, after}={}){
+export default function ({ type:tag, attrs, custom, children }, childHandler){
   const
-    // get formatted template data
-    { type:tag, attrs, custom } = before(data),
     // create HTMLElement
     elem = document.createElement(tag)
   ;
@@ -43,9 +41,8 @@ export default function (data, childHandler, {before, after}={}){
   } catch { err(msg) }
 
   // add children
-  elem.append(...childHandler(data.children))
-
-  after(elem, data)
+  elem.append(...childHandler(children))
+y
   return elem
 
 } 

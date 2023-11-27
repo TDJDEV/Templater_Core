@@ -23,6 +23,7 @@ console.log(converters)
 
 function outputErr() { err('unknown output type') }
 function templateErr() { err('template must be an object') }
+function post(fn) { return (res, source) => (fn(res, source), res) }
 
 window.err = function (msg) { throw new Error(msg) }
 window.Converter = (template, output, {before=x=>x, after=()=>{}}={}) => {
@@ -30,7 +31,9 @@ window.Converter = (template, output, {before=x=>x, after=()=>{}}={}) => {
 
   const converter = converters.get(output), opts = {before, after}
 
-  function handleChild(arr=[]) { return arr.map(x=>converter(x, handleChild, opts)) }
+  function handleChild(arr=[]) {
+    return arr.map(x=>post(after)(converter(before(x), handleChild, opts), x))
+  }
 
   return (converter || outputErr)(template, handleChild, opts)
 }
