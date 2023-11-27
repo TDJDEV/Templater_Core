@@ -27,13 +27,17 @@ function generatePostProcessor(fn) { return (res, source) => (fn(res, source), r
 
 window.err = function (msg) { throw new Error(msg) }
 window.Converter = (template, output, {before=x=>x, after=()=>{}}={}) => {
-  if(typeof template !== 'object' || Array.isArray(template) ) templateErr()
+  
+  const
+    converter = converters.get(output),
+    post = generatePostProcessor(after)
+  ;
 
-  const converter = converters.get(output), opts = {before, after}
-  const post = generatePostProcessor(after) 
-  function handleChild(arr=[]) {
-    return arr.map(x=>post(converter(before(x), handleChild, opts), x))
+  function handleChild(arr=[]) { return arr.map(x=>post(handleTemplate(before(x)), x)) }
+  function handleTemplate(converter, template){
+    if(typeof template !== 'object' || Array.isArray(template) ) templateErr()
+    return converter(template, handleChild)
   }
 
-  return (converter || outputErr)(template, handleChild, opts)
+  return handleTemplate(converter || outputErr, template)
 }

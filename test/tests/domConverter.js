@@ -35,7 +35,7 @@ tests.push({
     }
     throw new Error("unexpected result");
   }, // required if result is not set
-  params: [false],
+  params: [{type: 'input'}, ()=>[]],
   expected: "unexpected result"
 })
 

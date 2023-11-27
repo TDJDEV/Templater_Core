@@ -42,7 +42,7 @@ export default function ({ type:tag, attrs, custom, children }, childHandler){
 
   // add children
   elem.append(...childHandler(children))
-y
+
   return elem
 
 } 
