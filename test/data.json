@@ -1,0 +1,31 @@
+{
+  "TemplateA": {
+    "type": "toto",
+    "children": [
+      {
+        "type": "tata1",
+        "children": [
+          {"type": "titi1A"},
+          {"type": "titi1B"},
+          {"type": "titi1C"}
+        ]
+      },
+      {
+        "type": "tata2",
+        "children": [
+          {"type": "titi2A"},
+          {"type": "titi2B"},
+          {"type": "titi2C"}
+        ]
+      },
+      {
+        "type": "tata3",
+        "children": [
+          {"type": "titi3A"},
+          {"type": "titi3B"},
+          {"type": "titi3C"}
+        ]
+      }
+    ]
+  }
+}

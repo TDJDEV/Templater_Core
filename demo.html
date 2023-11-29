@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+  </head>
+  <body>
+    <script src="./dist/templater.min.js"></script>
+    <script>
+      const
+        myMap = new Map
+        Template = {
+          type: "toto",
+          children: [
+            {
+              type: "tata1",
+              children: [
+                {type: "titi1A"},
+                {type: "titi1B"},
+                {type: "titi1C"},
+              ]
+            },
+            {
+              type: "tata2",
+              children: [
+                {type: "titi2A"},
+                {type: "titi2B"},
+                {type: "titi2C"},
+              ]
+            },
+            {
+              type: "tata3",
+              children: [
+                {type: "titi3A"},
+                {type: "titi3B"},
+                {type: "titi3C"},
+              ]
+            },
+          ]
+        }
+      ;
+
+
+      function after(a, b) { myMap.set(a,b) }
+      function before(data) { return Object.entries(data).reduce(formatElem,{}) }
+      
+      function formatElem(elem, [key, value]) {
+        return (elem[key] = typeof value === 'string' ? `Formated-${value}` : value), elem
+      }
+
+      function generate(){
+        myMap.clear()
+        
+        return Converter(Template, 'dom', { before, after })
+      }
+    </script>
+  </body>
+</html>

@@ -5,7 +5,7 @@
   "main": "main.js",
   "scripts": {
     "build": "webpack --config webpack.prod.js",
-    "test": "mocha --delay --require babel-register test/index.js",
+    "test": "mocha --delay test/index.js",
     "mocha": "mocha",
     "start": "webpack serve --open --config webpack.dev.js"
   },
@@ -27,6 +27,7 @@
   },
   "dependencies": {
     "glob": "^10.3.10",
+    "jsdom": "^22.1.0",
     "mock-browser": "^0.92.14"
   },
   "type": "module"
