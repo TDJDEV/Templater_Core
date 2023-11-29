@@ -9,14 +9,37 @@
  * - DreamDevStudio
  * - Lanagramme
  * - TDJ.dev
- * @version 1.0.0
+ * @version O.0.0
  * @since September 5, 2023
- * @see [Otorp GitLab Repository](https://gitlab.com/tdj.dev/otorp)
+ * @see [Templater_core GitHub Repository](https://github.com/DreamDevStudio/Templater_Core)
  * @year 2023
 */
 // * @license MIT License
 //  * @copyright Copyright (c) 2023 by TDJ.dev and TDN (TISSOT Development Network)
 
-import Components from './components/main.js'
+import converters from './converters/main.js'
 
-console.log(Components)
+console.log(converters)
+
+function outputErr() { err('unknown output type') }
+function templateErr() { err('template must be an object') }
+function generatePostProcessor(fn) { return (res, source) => (fn(res, source), res) }
+
+window.err = function (msg) { throw new Error(msg) }
+window.Convertion = function Convertion(template, output, {before=x=>x, after=()=>{}}={}) {
+  
+  const
+    converter = converters.get(output),
+    post = generatePostProcessor(after)
+  ;
+
+  function handleChild(arr=[]) { return arr.map(x=>post(handleTemplate(before(x)), x)) }
+  function handleTemplate(converter, template){
+    if(typeof template !== 'object' || Array.isArray(template) ) templateErr()
+    return converter(template, handleChild)
+  }
+
+  return handleTemplate(converter || outputErr, template)
+}
+
+export default Convertion
